@@ -24,7 +24,7 @@ jobs:
           terraform_version: 1.5.5
       - run: terraform fmt -check -recursive
 
-  terraform-plan:
+#   terraform-plan:
     name: Terraform Plan
     needs: terraform-check
     runs-on: ubuntu-latest
@@ -44,7 +44,7 @@ jobs:
           name: terraform-plan
           path: tfplan
 
-  terraform-apply:
+#   terraform-apply:
     name: Terraform Apply
     needs: terraform-plan
     if: github.event_name == 'push'
