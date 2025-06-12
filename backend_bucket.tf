@@ -1,4 +1,4 @@
 resource "aws_s3_bucket" "state" {
-  bucket = "kostyamegasexy"
+  bucket = "frfllsbucket"
 }
 
