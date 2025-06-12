@@ -59,4 +59,4 @@ jobs:
           role-to-assume: arn:aws:iam::011900895823:role/GithubActionsRole
           aws-region: eu-north-1
       - run: terraform init
-      - run: terraform apply -auto-approve tfplan
+      - run: terraform apply -auto-approve
