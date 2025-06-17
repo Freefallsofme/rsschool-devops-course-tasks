@@ -40,7 +40,7 @@ resource "aws_security_group" "private_sg" {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = ["45.85.105.205/32"]
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   tags = {
