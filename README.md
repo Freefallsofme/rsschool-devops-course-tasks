@@ -1,6 +1,62 @@
-# rsschool-devops-course-tasks
-rsschool-devops-course-tasks
+Infrastructure Setup
 
-Note about infrastructure.
+1. **VPC**
 
-I’ve built a fully automated AWS infrastructure pipeline using Terraform and GitHub Actions. I defined and deployed an S3 bucket to store my Terraform state, secured access with an IAM user protected by MFA for local work and an OIDC-backed IAM role for GitHub Actions, and configured a CI/CD workflow that automatically formats, plans, and applies my Terraform code on PRs and pushes—everything managed through AWS CLI and Terraform.
+   * CIDR: `10.0.0.0/16`
+2. **Subnets**
+
+   * Public Subnets: `10.0.1.0/24`, `10.0.2.0/24`
+   * Private Subnets: `10.0.3.0/24`, `10.0.4.0/24`
+3. **Internet Gateway** and **Route Tables**
+
+   * Public route table → attaches to Internet Gateway
+   * Private route table → routes through NAT instance
+4. **Security Groups**
+
+   * **bastionsg**: SSH from your IP only
+   * **privatesg**: SSH from Bastion only; all outbound allowed
+   * **natsg**: VPC‑internal access for NAT instance
+5. **Instances**
+
+   * **Bastion Host** in a public subnet
+   * **NAT Instance** in a public subnet (source\_dest\_check disabled)
+
+## Usage
+
+1. Initialize Terraform:
+
+   ```bash
+   terraform init
+   ```
+
+2. Preview changes:
+
+   ```bash
+   terraform plan
+   ```
+
+3. Apply configuration:
+
+   ```bash
+   terraform apply
+   # Type 'yes' to confirm
+   ```
+
+4. SSH to Bastion Host:
+
+   ```bash
+   ssh -i <key.pem> ubuntu@<Bastion_Public_IP>
+   ```
+
+5. From Bastion, SSH to a private instance:
+
+   ```bash
+   ssh -i <key.pem> ubuntu@<Private_Instance_IP>
+   ```
+
+6. To destroy resources:
+
+   ```bash
+   terraform destroy
+   # Type 'yes' to confirm
+   ```
