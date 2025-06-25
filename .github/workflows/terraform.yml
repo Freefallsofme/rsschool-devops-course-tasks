@@ -35,7 +35,7 @@ jobs:
           terraform_version: 1.5.5
       - uses: aws-actions/configure-aws-credentials@v2
         with:
-          role-to-assume: arn:aws:iam::011900895823:role/GithubActionsRole
+          role-to-assume: arn:aws:iam::639794896843:role/GithubActionsRole
           aws-region: eu-north-1
       - run: terraform init
       - run: terraform plan -out=tfplan
@@ -56,7 +56,7 @@ jobs:
           terraform_version: 1.5.5
       - uses: aws-actions/configure-aws-credentials@v2
         with:
-          role-to-assume: arn:aws:iam::011900895823:role/GithubActionsRole
+          role-to-assume: arn:aws:iam::639794896843:role/GithubActionsRole
           aws-region: eu-north-1
       - run: terraform init
       - run: terraform apply -auto-approve
