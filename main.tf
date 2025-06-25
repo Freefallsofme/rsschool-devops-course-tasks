@@ -2,7 +2,7 @@ terraform {
   required_version = ">= 1.0"
 
   backend "s3" {
-    bucket         = "frfllsbucket"
+    bucket         = "atatabucket"
     key            = "terraform.tfstate"
     region         = "eu-north-1"
     encrypt        = true
