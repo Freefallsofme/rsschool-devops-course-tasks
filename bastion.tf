@@ -28,3 +28,5 @@ resource "aws_instance" "bastion" {
   key_name                    = aws_key_pair.deployer.key_name
   tags                        = { Name = "BastionHost" }
 }
+
+
