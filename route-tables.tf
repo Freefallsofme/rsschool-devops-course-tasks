@@ -38,8 +38,8 @@ resource "aws_route_table_association" "private" {
 }
 
 resource "aws_route_table_association" "private_bastion" {
-  count          = length(aws_subnet.private)
-  subnet_id      = aws_subnet.private[0].id
+  count          = length(aws_subnet.public)
+  subnet_id      = aws_subnet.public[0].id
   route_table_id = aws_route_table.private.id
 }
 
