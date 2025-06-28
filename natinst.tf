@@ -34,7 +34,6 @@ resource "aws_security_group" "nat_sg" {
   }
 }
 
-
 resource "aws_instance" "nat" {
   ami                         = data.aws_ami.ubuntu.id
   instance_type               = "t3.micro"
@@ -46,7 +45,13 @@ resource "aws_instance" "nat" {
 
   user_data = <<-EOF
               #!/bin/bash
+              if ! grep -q '^net.ipv4.ip_forward=1' /etc/sysctl.conf; then
+                echo 'net.ipv4.ip_forward=1' >> /etc/sysctl.conf
+              else
+                sed -i 's/^net.ipv4.ip_forward=.*/net.ipv4.ip_forward=1/' /etc/sysctl.conf
+              fi
               sysctl -w net.ipv4.ip_forward=1
+              iptables -t nat -C POSTROUTING -o $(ip r | grep default | awk '{print $5}') -j MASQUERADE 2>/dev/null || \
               iptables -t nat -A POSTROUTING -o $(ip r | grep default | awk '{print $5}') -j MASQUERADE
               EOF
 
