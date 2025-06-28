@@ -40,6 +40,8 @@ resource "aws_instance" "nat" {
   subnet_id              = aws_subnet.public[0].id
   vpc_security_group_ids = [aws_security_group.nat_sg.id]
   source_dest_check      = false
+  key_name               = aws_key_pair.deployer.key_name
+
 
   user_data = <<-EOF
               #!/bin/bash
