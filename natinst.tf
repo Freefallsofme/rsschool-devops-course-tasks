@@ -9,6 +9,19 @@ resource "aws_security_group" "nat_sg" {
     protocol    = "tcp"
     cidr_blocks = [var.vpc_cidr]
   }
+  ingress {
+    from_port   = 0
+    to_port     = 65535
+    protocol    = "udp"
+    cidr_blocks = [var.vpc_cidr]
+  }
+  ingress {
+    from_port   = -1
+    to_port     = -1
+    protocol    = "icmp"
+    cidr_blocks = [var.vpc_cidr]
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
@@ -22,24 +35,14 @@ resource "aws_security_group" "nat_sg" {
 }
 
 resource "aws_instance" "nat" {
-  ami                         = data.aws_ami.ubuntu.id
-  instance_type               = "t3.micro"
-  subnet_id                   = aws_subnet.public[0].id
-  vpc_security_group_ids      = [aws_security_group.nat_sg.id]
-  associate_public_ip_address = true
-  source_dest_check           = false
+  ami                    = data.aws_ami.ubuntu.id # Используем data из bastion.tf
+  instance_type          = "t3.micro"
+  subnet_id              = aws_subnet.public[0].id
+  vpc_security_group_ids = [aws_security_group.nat_sg.id]
+
+  source_dest_check = false
 
   tags = {
     Name = "NATInstance"
   }
-}
-
-resource "aws_route" "private_nat_route" {
-  route_table_id         = aws_route_table.private.id
-  destination_cidr_block = "0.0.0.0/0"
-  network_interface_id   = aws_instance.nat.primary_network_interface_id
-
-  depends_on = [
-    aws_instance.nat
-  ]
 }
