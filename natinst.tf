@@ -34,22 +34,24 @@ resource "aws_security_group" "nat_sg" {
   }
 }
 
-resource "aws_instance" "nat" {
-  ami                    = data.aws_ami.ubuntu.id
-  instance_type          = "t3.micro"
-  subnet_id              = aws_subnet.public[0].id
-  vpc_security_group_ids = [aws_security_group.nat_sg.id]
-  source_dest_check      = false
-  key_name               = aws_key_pair.deployer.key_name
 
+resource "aws_instance" "nat" {
+  ami                         = data.aws_ami.ubuntu.id
+  instance_type               = "t3.micro"
+  subnet_id                   = aws_subnet.public[0].id
+  vpc_security_group_ids      = [aws_security_group.nat_sg.id]
+  source_dest_check           = false
+  associate_public_ip_address = true
+  key_name                    = aws_key_pair.deployer.key_name
 
   user_data = <<-EOF
               #!/bin/bash
               sysctl -w net.ipv4.ip_forward=1
-              iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+              iptables -t nat -A POSTROUTING -o $(ip r | grep default | awk '{print $5}') -j MASQUERADE
               EOF
 
   tags = {
     Name = "NATInstance"
   }
 }
+
