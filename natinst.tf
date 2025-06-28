@@ -35,12 +35,17 @@ resource "aws_security_group" "nat_sg" {
 }
 
 resource "aws_instance" "nat" {
-  ami                    = data.aws_ami.ubuntu.id # Используем data из bastion.tf
+  ami                    = data.aws_ami.ubuntu.id
   instance_type          = "t3.micro"
   subnet_id              = aws_subnet.public[0].id
   vpc_security_group_ids = [aws_security_group.nat_sg.id]
+  source_dest_check      = false
 
-  source_dest_check = false
+  user_data = <<-EOF
+              #!/bin/bash
+              sysctl -w net.ipv4.ip_forward=1
+              iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+              EOF
 
   tags = {
     Name = "NATInstance"
