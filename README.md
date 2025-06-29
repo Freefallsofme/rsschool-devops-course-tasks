@@ -1,62 +1,37 @@
-Infrastructure Setup
+# K3s Kubernetes Cluster on AWS
+This project deploys a lightweight Kubernetes cluster using k3s on AWS with a bastion host.
 
-1. **VPC**
+## Steps to Deploy
 
-   * CIDR: `10.0.0.0/16`
-2. **Subnets**
-
-   * Public Subnets: `10.0.1.0/24`, `10.0.2.0/24`
-   * Private Subnets: `10.0.3.0/24`, `10.0.4.0/24`
-3. **Internet Gateway** and **Route Tables**
-
-   * Public route table → attaches to Internet Gateway
-   * Private route table → routes through NAT instance
-4. **Security Groups**
-
-   * **bastionsg**: SSH from your IP only
-   * **privatesg**: SSH from Bastion only; all outbound allowed
-   * **natsg**: VPC‑internal access for NAT instance
-5. **Instances**
-
-   * **Bastion Host** in a public subnet
-   * **NAT Instance** in a public subnet (source\_dest\_check disabled)
-
-## Usage
-
-1. Initialize Terraform:
-
+1. Initialize and apply Terraform:
    ```bash
    terraform init
-   ```
-
-2. Preview changes:
-
-   ```bash
-   terraform plan
-   ```
-
-3. Apply configuration:
-
-   ```bash
    terraform apply
-   # Type 'yes' to confirm
-   ```
+SSH to the bastion host:
 
-4. SSH to Bastion Host:
+bash
+Копировать
+Редактировать
+ssh -i ~/.ssh/id_ed25519 ubuntu@<BASTION_PUBLIC_IP>
+Copy kubeconfig from the k3s server to the bastion:
 
-   ```bash
-   ssh -i <key.pem> ubuntu@<Bastion_Public_IP>
-   ```
+bash
+Копировать
+Редактировать
+scp -i ~/.ssh/id_ed25519 ubuntu@<K3S_SERVER_PRIVATE_IP>:/etc/rancher/k3s/k3s.yaml ~/
+Edit k3s.yaml and replace 127.0.0.1 with the k3s server’s private IP.
 
-5. From Bastion, SSH to a private instance:
+Set kubeconfig environment variable and check nodes:
 
-   ```bash
-   ssh -i <key.pem> ubuntu@<Private_Instance_IP>
-   ```
+bash
+Копировать
+Редактировать
+export KUBECONFIG=~/k3s.yaml
+kubectl get nodes
+Deploy a test pod:
 
-6. To destroy resources:
-
-   ```bash
-   terraform destroy
-   # Type 'yes' to confirm
-   ```
+bash
+Копировать
+Редактировать
+kubectl apply -f https://k8s.io/examples/pods/simple-pod.yaml
+kubectl get pods --all-namespaces
