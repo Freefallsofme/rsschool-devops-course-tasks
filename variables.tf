@@ -20,3 +20,9 @@ variable "privsub" {
   description = "CIDR blocks for private subnets"
   default     = ["10.0.3.0/24", "10.0.4.0/24"]
 }
+
+variable "ssh_private_key_path" {
+  description = "Path to priv ssh key for accesing priv insts"
+  type        = string
+}
+
