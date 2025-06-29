@@ -1,62 +1,36 @@
-Infrastructure Setup
+# K3s Kubernetes Cluster on AWS
 
-1. **VPC**
+## Overview
 
-   * CIDR: `10.0.0.0/16`
-2. **Subnets**
+This project deploys a lightweight Kubernetes cluster using k3s on AWS with a bastion host.
 
-   * Public Subnets: `10.0.1.0/24`, `10.0.2.0/24`
-   * Private Subnets: `10.0.3.0/24`, `10.0.4.0/24`
-3. **Internet Gateway** and **Route Tables**
+## Deployment Steps
 
-   * Public route table → attaches to Internet Gateway
-   * Private route table → routes through NAT instance
-4. **Security Groups**
-
-   * **bastionsg**: SSH from your IP only
-   * **privatesg**: SSH from Bastion only; all outbound allowed
-   * **natsg**: VPC‑internal access for NAT instance
-5. **Instances**
-
-   * **Bastion Host** in a public subnet
-   * **NAT Instance** in a public subnet (source\_dest\_check disabled)
-
-## Usage
-
-1. Initialize Terraform:
-
+1. Initialize and apply Terraform:
    ```bash
    terraform init
-   ```
-
-2. Preview changes:
-
-   ```bash
-   terraform plan
-   ```
-
-3. Apply configuration:
-
-   ```bash
    terraform apply
-   # Type 'yes' to confirm
    ```
 
-4. SSH to Bastion Host:
-
+2. SSH to the bastion host:
    ```bash
-   ssh -i <key.pem> ubuntu@<Bastion_Public_IP>
+   ssh -i ~/.ssh/id_ed25519 ubuntu@13.48.178.154
    ```
 
-5. From Bastion, SSH to a private instance:
-
+3. Copy kubeconfig from the k3s server to the bastion:
    ```bash
-   ssh -i <key.pem> ubuntu@<Private_Instance_IP>
+   scp -i ~/.ssh/id_ed25519 ubuntu@10.0.3.193:/etc/rancher/k3s/k3s.yaml ~/
+   ```
+   Edit the downloaded `k3s.yaml` file and replace `127.0.0.1` with `10.0.3.193`.
+
+4. Set kubeconfig environment variable and check cluster nodes:
+   ```bash
+   export KUBECONFIG=~/k3s.yaml
+   kubectl get nodes
    ```
 
-6. To destroy resources:
-
+5. Deploy a test pod:
    ```bash
-   terraform destroy
-   # Type 'yes' to confirm
+   kubectl apply -f https://k8s.io/examples/pods/simple-pod.yaml
+   kubectl get pods --all-namespaces
    ```
