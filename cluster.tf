@@ -7,41 +7,12 @@ resource "aws_instance" "k3s_server" {
 
   user_data = <<-EOF
 #!/bin/bash
-curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --write-kubeconfig-mode 644" sh -
+curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --write-kubeconfig-mode 644 --token ${var.k3s_token}" sh -
 EOF
 
   tags = {
     Name = "k3s-server"
   }
-}
-
-resource "null_resource" "wait_for_token" {
-  depends_on = [aws_instance.k3s_server]
-
-  provisioner "remote-exec" {
-    connection {
-      type                = "ssh"
-      user                = "ubuntu"
-      host                = aws_instance.k3s_server.private_ip
-      private_key         = file(var.ssh_private_key_path)
-      bastion_host        = aws_instance.bastion.public_ip
-      bastion_user        = "ubuntu"
-      bastion_private_key = file(var.ssh_private_key_path)
-    }
-
-    inline = [
-      "until [ -f /var/lib/rancher/k3s/server/node-token ]; do sleep 5; done"
-    ]
-  }
-}
-
-data "external" "k3s_token" {
-  depends_on = [null_resource.wait_for_token]
-
-  program = [
-    "bash", "-c",
-    "ssh -o StrictHostKeyChecking=no -i ${var.ssh_private_key_path} -J ubuntu@${aws_instance.bastion.public_ip} ubuntu@${aws_instance.k3s_server.private_ip} 'sudo cat /var/lib/rancher/k3s/server/node-token'"
-  ]
 }
 
 resource "aws_instance" "k3s_agent" {
@@ -53,10 +24,10 @@ resource "aws_instance" "k3s_agent" {
 
   user_data = <<-EOF
 #!/bin/bash
-curl -sfL https://get.k3s.io | K3S_URL=https://${aws_instance.k3s_server.private_ip}:6443 K3S_TOKEN=${data.external.k3s_token.result.stdout} sh -
+curl -sfL https://get.k3s.io | K3S_URL="https://${aws_instance.k3s_server.private_ip}:6443" K3S_TOKEN="${var.k3s_token}" sh -
 EOF
 
-  depends_on = [data.external.k3s_token]
+  depends_on = [aws_instance.k3s_server]
 
   tags = {
     Name = "k3s-agent"

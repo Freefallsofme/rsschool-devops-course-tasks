@@ -21,8 +21,8 @@ variable "privsub" {
   default     = ["10.0.3.0/24", "10.0.4.0/24"]
 }
 
-variable "ssh_private_key_path" {
-  description = "Path to priv ssh key for accesing priv insts"
+variable "k3s_token" {
+  description = "K3s cluster token"
   type        = string
 }
 

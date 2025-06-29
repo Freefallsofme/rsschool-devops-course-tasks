@@ -1,4 +1,4 @@
-ssh_private_key_path = "~/.ssh/id_ed25519"
+k3s_token = "your-super-secret-token"
 region               = "eu-north-1"
 vpc_cidr             = "10.0.0.0/16"
 pubsub               = ["10.0.1.0/24", "10.0.2.0/24"]
