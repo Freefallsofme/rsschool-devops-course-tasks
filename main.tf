@@ -2,7 +2,7 @@ terraform {
   required_version = ">= 1.0"
 
   backend "s3" {
-    bucket         = "frfllsbucket"
+    bucket         = "atatabucket"
     key            = "terraform.tfstate"
     region         = "eu-north-1"
     encrypt        = true
@@ -14,3 +14,6 @@ provider "aws" {
   region = "eu-north-1"
 }
 
+data "aws_availability_zones" "available" {
+  state = "available"
+}
