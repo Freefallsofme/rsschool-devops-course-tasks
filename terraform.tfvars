@@ -1,5 +1,4 @@
-k3s_token = "your-super-secret-token"
-region               = "eu-north-1"
-vpc_cidr             = "10.0.0.0/16"
-pubsub               = ["10.0.1.0/24", "10.0.2.0/24"]
-privsub              = ["10.0.3.0/24", "10.0.4.0/24"]
+region   = "eu-north-1"
+vpc_cidr = "10.0.0.0/16"
+pubsub   = ["10.0.1.0/24", "10.0.2.0/24"]
+privsub  = ["10.0.3.0/24", "10.0.4.0/24"]

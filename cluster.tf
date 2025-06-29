@@ -1,3 +1,8 @@
+resource "random_password" "k3s_token" {
+  length  = 32
+  special = false
+}
+
 resource "aws_instance" "k3s_server" {
   ami                    = data.aws_ami.ubuntu.id
   instance_type          = "t3.micro"
@@ -7,7 +12,7 @@ resource "aws_instance" "k3s_server" {
 
   user_data = <<-EOF
 #!/bin/bash
-curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --write-kubeconfig-mode 644 --token ${var.k3s_token}" sh -
+curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --write-kubeconfig-mode 644 --token ${random_password.k3s_token.result}" sh -
 EOF
 
   tags = {
@@ -22,12 +27,12 @@ resource "aws_instance" "k3s_agent" {
   vpc_security_group_ids = [aws_security_group.private_sg.id]
   key_name               = aws_key_pair.deployer.key_name
 
+  depends_on = [aws_instance.k3s_server]
+
   user_data = <<-EOF
 #!/bin/bash
-curl -sfL https://get.k3s.io | K3S_URL="https://${aws_instance.k3s_server.private_ip}:6443" K3S_TOKEN="${var.k3s_token}" sh -
+curl -sfL https://get.k3s.io | K3S_URL="https://${aws_instance.k3s_server.private_ip}:6443" K3S_TOKEN="${random_password.k3s_token.result}" sh -
 EOF
-
-  depends_on = [aws_instance.k3s_server]
 
   tags = {
     Name = "k3s-agent"
