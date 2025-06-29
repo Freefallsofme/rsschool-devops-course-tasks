@@ -1,4 +1,3 @@
-
 # K3s Kubernetes Cluster on AWS
 
 ## Overview
