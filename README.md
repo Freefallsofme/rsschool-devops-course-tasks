@@ -20,7 +20,7 @@ kubectl apply -f jenkins-03-deployment.yaml
 ```bash
 kubectl get deployments -n devops-tools
 ```
-##Accessing Jenkins Using Kubernetes Service
+## Accessing Jenkins Using Kubernetes Service
  1. Create 'jenkins-04-service.yaml' 
 ```bash
 kubectl apply -f jenkins-04-service.yaml
