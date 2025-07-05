@@ -35,8 +35,7 @@ Check your ip in your case.
 ```bash
 kubectl logs whateverthenameofyourpodis --namespace=devops-tools
 ```
-
-### Congrats, you've made it. 
+Congrats, you've made it. 
 
 
 # Jenkins Freestyle Project: Display "Hello world" in Build Logs
@@ -56,7 +55,8 @@ kubectl logs whateverthenameofyourpodis --namespace=devops-tools
 - Click **"Add build step"**
 - Select **"Execute shell"** (for Linux/macOS Jenkins agent) or **"Execute Windows batch command"** (for Windows Jenkins agent)
 - In the command box, type:
-
-  ```bash
-  echo "Hello world"
+```bash
+ echo "Hello world"
 ```
+- Click "Save" at the bottom of the page
+On the project page, click "Build Now" on the left sidebar.
