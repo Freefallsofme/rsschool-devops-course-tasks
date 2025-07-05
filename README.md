@@ -1,36 +1,26 @@
-# K3s Kubernetes Cluster on AWS
+# Jenkins Installation and Configuration
 
-## Overview
+## 1. Verifying Helm
+ ```bash
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm repo update
+ ```
+ ```bash
+helm install verify-nginx bitnami/nginx
+ ```
+```bash
+kubectl get pods -l app.kubernetes.io/instance=verify-nginx
+ ```
+Output: 
+ ```bash
+NAME                           READY   STATUS    RESTARTS   AGE
+verify-nginx-bf6464b76-hrhrs   1/1     Running   0          27s
+ ```
+ ```bash
+helm uninstall verify-nginx
+ ```
+ ```bash
+kubectl get pods -l app.kubernetes.io/instance=verify-nginx
+ ```
 
-This project deploys a lightweight Kubernetes cluster using k3s on AWS with a bastion host.
-
-## Deployment Steps
-
-1. Initialize and apply Terraform:
-   ```bash
-   terraform init
-   terraform apply
-   ```
-
-2. SSH to the bastion host:
-   ```bash
-   ssh -i ~/.ssh/id_ed25519 ubuntu@pubipofbastion
-   ```
-
-3. Copy kubeconfig from the k3s server to the bastion:
-   ```bash
-   scp -i ~/.ssh/id_ed25519 ubuntu@privipofk3sserver:/etc/rancher/k3s/k3s.yaml ~/
-   ```
-   Edit the downloaded `k3s.yaml` file and replace `127.0.0.1` with `.....`.
-
-4. Set kubeconfig environment variable and check cluster nodes:
-   ```bash
-   export KUBECONFIG=~/k3s.yaml
-   kubectl get nodes
-   ```
-
-5. Deploy a test pod:
-   ```bash
-   kubectl apply -f https://k8s.io/examples/pods/simple-pod.yaml
-   kubectl get pods --all-namespaces
-   ```
+## 2. Cluster Requirements
