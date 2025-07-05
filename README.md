@@ -1,36 +1,62 @@
-# K3s Kubernetes Cluster on AWS
 
-## Overview
+# Kubernetes Jenkins Deployment
 
-This project deploys a lightweight Kubernetes cluster using k3s on AWS with a bastion host.
+### 1. Create a Namespace for Jenkins
+ ```bash
+kubectl create namespace devops-tools
+ ```
+### 2. Create a jenkins-01-serviceAccount.yaml then create the service account using kubectl.
+ ```bash
+kubectl apply -f jenkins-01-serviceAccount.yaml
+ ```
+### 3. Create jenkins-02-volume.yaml 
+```bash
+kubectl create -f jenkins-02-volume.yaml
+ ```
+### 4. Create a Deployment file named 'jenkins-03-deployment.yaml'
+```bash
+kubectl apply -f jenkins-03-deployment.yaml
+```
+### 5. Check the deployment status.
+```bash
+kubectl get deployments -n devops-tools
+```
+## Accessing Jenkins Using Kubernetes Service
+### 1. Create 'jenkins-04-service.yaml' 
+```bash
+kubectl apply -f jenkins-04-service.yaml
+```
+### 2. Access the Jenkins dashboard 
+```bash
+http://192.168.49.2:32000
+```
+Check your ip in your case. 
+### 3. Get password from logs.
+```bash
+kubectl logs whateverthenameofyourpodis --namespace=devops-tools
+```
+Congrats, you've made it. 
 
-## Deployment Steps
 
-1. Initialize and apply Terraform:
-   ```bash
-   terraform init
-   terraform apply
-   ```
+# Jenkins Freestyle Project: Display "Hello world" in Build Logs
 
-2. SSH to the bastion host:
-   ```bash
-   ssh -i ~/.ssh/id_ed25519 ubuntu@pubipofbastion
-   ```
 
-3. Copy kubeconfig from the k3s server to the bastion:
-   ```bash
-   scp -i ~/.ssh/id_ed25519 ubuntu@privipofk3sserver:/etc/rancher/k3s/k3s.yaml ~/
-   ```
-   Edit the downloaded `k3s.yaml` file and replace `127.0.0.1` with `.....`.
+### 1. Create a New Freestyle Project
 
-4. Set kubeconfig environment variable and check cluster nodes:
-   ```bash
-   export KUBECONFIG=~/k3s.yaml
-   kubectl get nodes
-   ```
+- Open Jenkins in your browser (e.g., http://<jenkins-ip>:<port>)
+- Click on **"New Item"** on the left menu
+- Enter a name for your project, e.g., `hello-world-job`
+- Select **"Freestyle project"**
+- Click **OK**
 
-5. Deploy a test pod:
-   ```bash
-   kubectl apply -f https://k8s.io/examples/pods/simple-pod.yaml
-   kubectl get pods --all-namespaces
-   ```
+### 2. Add a Build Step
+
+- Scroll down to the **"Build"** section
+- Click **"Add build step"**
+- Select **"Execute shell"** (for Linux/macOS Jenkins agent) or **"Execute Windows batch command"** (for Windows Jenkins agent)
+- In the command box, type:
+```bash
+ echo "Hello world"
+```
+- Click "Save" at the bottom of the page
+On the project page, click "Build Now" on the left sidebar.
