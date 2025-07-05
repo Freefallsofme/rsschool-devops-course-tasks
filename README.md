@@ -1,26 +1,42 @@
-# Jenkins Installation and Configuration
 
-## 1. Verifying Helm
+# Kubernetes Jenkins Deployment
+## 1. Create a Namespace for Jenkins
  ```bash
-helm repo add bitnami https://charts.bitnami.com/bitnami
-helm repo update
+kubectl create namespace devops-tools
  ```
+## 2. Create a jenkins-01-serviceAccount.yaml then create the service account using kubectl.
  ```bash
-helm install verify-nginx bitnami/nginx
+kubectl apply -f jenkins-01-serviceAccount.yaml
  ```
+## 3. Create jenkins-02-volume.yaml 
 ```bash
-kubectl get pods -l app.kubernetes.io/instance=verify-nginx
+kubectl create -f jenkins-02-volume.yaml
  ```
-Output: 
- ```bash
-NAME                           READY   STATUS    RESTARTS   AGE
-verify-nginx-bf6464b76-hrhrs   1/1     Running   0          27s
- ```
- ```bash
-helm uninstall verify-nginx
- ```
- ```bash
-kubectl get pods -l app.kubernetes.io/instance=verify-nginx
- ```
+## 4. Create a Deployment file named 'jenkins-03-deployment.yaml'
+```bash
+kubectl apply -f jenkins-03-deployment.yaml
+```
+## 5. Check the deployment status.
+```bash
+kubectl get deployments -n devops-tools
+```
 
-## 2. Cluster Requirements
+# Accessing Jenkins Using Kubernetes Service
+
+## 1. Create 'jenkins-04-service.yaml' 
+```bash
+kubectl apply -f jenkins-04-service.yaml
+```
+
+## 2. Access the Jenkins dashboard 
+```bash
+http://192.168.49.2:32000
+```
+Check your ip in your case. 
+
+## 3 Get password from logs.
+```bash
+kubectl logs whateverthenameofyourpodis --namespace=devops-tools
+```
+
+Congrats, you've made it. 
