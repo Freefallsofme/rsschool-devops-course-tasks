@@ -1,13 +1,12 @@
 name: Terraform CI/CD
 
 on:
-  pull_request:
-    branches:
-      - main
-
   push:
     branches:
-      - main
+      - '**'
+  pull_request:
+    branches:
+      - '**'
 
 permissions:
   id-token: write
@@ -60,3 +59,4 @@ jobs:
           aws-region: eu-north-1
       - run: terraform init
       - run: terraform apply -auto-approve
+

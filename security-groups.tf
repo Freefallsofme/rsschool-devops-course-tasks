@@ -25,13 +25,21 @@ resource "aws_security_group" "bastion_sg" {
 
 resource "aws_security_group" "private_sg" {
   name        = "privatesg"
-  description = "Allow SSH from bastion host"
+  description = "Allow SSH and K8s API from bastion host"
   vpc_id      = aws_vpc.main.id
 
   ingress {
     description     = "SSH from Bastion SG"
     from_port       = 22
     to_port         = 22
+    protocol        = "tcp"
+    security_groups = [aws_security_group.bastion_sg.id]
+  }
+
+  ingress {
+    description     = "Allow K8s API from Bastion SG"
+    from_port       = 6443
+    to_port         = 6443
     protocol        = "tcp"
     security_groups = [aws_security_group.bastion_sg.id]
   }
@@ -47,3 +55,4 @@ resource "aws_security_group" "private_sg" {
     Name = "Private"
   }
 }
+
