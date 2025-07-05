@@ -3,22 +3,26 @@ name: Deploy Jenkins
 on:
   push:
     branches:
-      - task_4      
+      - task_4
   workflow_dispatch:
-
-env:
-  KUBE_NAMESPACE: jenkins
-  CHART_PATH: helm/jenkins
-  RELEASE_NAME: jenkins
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
 
-      - name: Set up Kubernetes tools
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      KUBE_NAMESPACE: jenkins
+      CHART_PATH: helm/jenkins
+      RELEASE_NAME: jenkins
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up kubectl
         uses: azure/setup-kubectl@v3
         with:
           version: 'v1.33.2'
@@ -27,15 +31,19 @@ jobs:
         uses: azure/setup-helm@v3
         with:
           version: 'latest'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Configure KUBECONFIG
         run: |
           echo "${{ secrets.KUBECONFIG }}" > kubeconfig
           chmod 600 kubeconfig
-          export KUBECONFIG=$PWD/kubeconfig
+          echo "KUBECONFIG=$PWD/kubeconfig" >> $GITHUB_ENV
 
       - name: Ensure namespace exists
-        run: kubectl create namespace $KUBE_NAMESPACE --dry-run=client -o yaml | kubectl apply -f -
+        run: |
+          kubectl create namespace $KUBE_NAMESPACE --dry-run=client -o yaml \
+            | kubectl apply -f -
 
       - name: Deploy Jenkins via Helm
         run: |
