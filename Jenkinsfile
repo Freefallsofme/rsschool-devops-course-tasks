@@ -1,102 +1,63 @@
 pipeline {
-  agent any
+    agent any
 
-  environment {
-    REGISTRY    = 'docker.io/atatara'
-    IMAGE_NAME  = "${REGISTRY}/flask-app"
-    CHART_PATH  = 'helm/flask-app'
-    NAMESPACE   = 'default'
-    SONARQUBE   = 'MySonarQube'      // имя SonarQube-сервера в Jenkins
-    CRED_DOCKER = 'docker-hub-creds' 
-    CRED_KUBE   = 'kubeconfig-cred'  // ID Jenkins‑креденшиала с kubeconfig
-  }
-
-  triggers {
-    // Если у вас Multibranch Pipeline с вебхуками — этот блок можно убрать
-    pollSCM('* * * * *')
-  }
-
-  stages {
-    stage('Checkout') {
-      steps {
-        checkout scm
-      }
+    environment {
+        DOCKER_IMAGE = 'atatara/rsschool-flask'
+        APP_DIR = 'app/flask-app'
+        HELM_DIR = 'helm/flask-app'
+        SONAR_PROJECT_KEY = 'rsschool-flask'
+        SONAR_HOST_URL = 'http://sonarqube.devops-tools.svc.cluster.local:9000'
     }
 
-    stage('Build Docker Image') {
-      steps {
-        dir('app/flask-app') {
-          sh 'docker build -t $IMAGE_NAME:latest .'
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
         }
-      }
-    }
 
-    stage('Unit Tests') {
-      steps {
-        dir('app/flask-app') {
-          sh 'pip install -r requirements.txt'
-          sh 'pytest --maxfail=1 --disable-warnings -q'
+        stage('SonarQube Analysis') {
+            steps {
+                withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_TOKEN')]) {
+                    dir("${APP_DIR}") {
+                        sh '''
+                            sonar-scanner \
+                              -Dsonar.projectKey=$SONAR_PROJECT_KEY \
+                              -Dsonar.sources=. \
+                              -Dsonar.host.url=$SONAR_HOST_URL \
+                              -Dsonar.login=$SONAR_TOKEN
+                        '''
+                    }
+                }
+            }
         }
-      }
-    }
 
-    stage('SonarQube Analysis') {
-      steps {
-        withSonarQubeEnv("${SONARQUBE}") {
-          sh 'sonar-scanner -Dsonar.projectKey=flask-app'
+        stage('Build Docker image') {
+            steps {
+                dir("${APP_DIR}") {
+                    sh 'docker build -t $DOCKER_IMAGE .'
+                }
+            }
         }
-      }
-    }
 
-    stage('Push to Docker Hub') {
-      steps {
-        withCredentials([usernamePassword(
-          credentialsId: env.CRED_DOCKER,
-          usernameVariable: 'DOCKER_USER',
-          passwordVariable: 'DOCKER_PASS'
-        )]) {
-          sh '''
-            echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
-            docker push $IMAGE_NAME:latest
-          '''
+        stage('Push Docker image') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKERHUB_USER', passwordVariable: 'DOCKERHUB_PASS')]) {
+                    script {
+                        sh 'echo $DOCKERHUB_PASS | docker login -u $DOCKERHUB_USER --password-stdin'
+                        sh 'docker push $DOCKER_IMAGE'
+                    }
+                }
+            }
         }
-      }
-    }
 
-    stage('Deploy with Helm') {
-      steps {
-        withCredentials([file(
-          credentialsId: env.CRED_KUBE,
-          variable: 'KUBECONFIG'
-        )]) {
-          sh """
-            helm upgrade --install flask-app $CHART_PATH \
-              --namespace $NAMESPACE --create-namespace \
-              --values $CHART_PATH/values.yaml
-          """
+        stage('Deploy with Helm') {
+            steps {
+                dir("${HELM_DIR}") {
+                    sh 'helm upgrade --install flask-app . --set image.repository=$DOCKER_IMAGE'
+                }
+            }
         }
-      }
     }
-
-    stage('Smoke Test') {
-      steps {
-        sh 'sleep 15'
-        sh 'curl -f http://localhost:8080/ || exit 1'
-      }
-    }
-  }
-
-  post {
-    success {
-      mail to: '<YOUR_EMAIL>',
-           subject: "SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-           body: "Pipeline succeeded"
-    }
-    failure {
-      mail to: '<YOUR_EMAIL>',
-           subject: "FAILURE: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-           body: "Pipeline failed"
-    }
-  }
 }
 

@@ -1,51 +1,37 @@
 controller:
-  adminUser: admin
-  adminPassword: admin
-
-  serviceAccount:
-    create: false
-    name: jenkins-admin
+  admin:
+    username: admin
+    password: admin
 
   installPlugins:
-    - kubernetes:4190.vb_29d79c30091
-    - workflow-aggregator:596.v8c21c963d92d
-    - git:5.2.0
-    - configuration-as-code:1775.v810dc950b_514
-    - credentials-binding:630.vf8a_502e3f85b_
-    - pipeline-stage-view:2.34
-    - blueocean:1.27.5
-    - docker-workflow:572.v950f58993843
+    - kubernetes
+    - workflow-aggregator
+    - git
+    - configuration-as-code
+    - credentials-binding
+    - pipeline-stage-view
+    - blueocean
+    - docker-workflow
+    - github
+    - job-dsl
+    - pipeline-github-lib
+    - pipeline-utility-steps
     - sonar
-    - mailer
+    - ws-cleanup
+
+  ingress:
+    enabled: false
+
+  serviceType: ClusterIP
 
   persistence:
-    enabled: true
-    existingClaim: jenkins-pvc
-    size: 8Gi
-
-  service:
-    type: NodePort
-    port: 8080
-    targetPort: 8080
-    nodePort: 30000
+    enabled: false
 
   resources:
     requests:
-      cpu: "500m"
+      cpu: "300m"
       memory: "512Mi"
     limits:
       cpu: "1"
-      memory: "1Gi"
-
-  jenkinsUriPrefix: ""
-  jenkinsUrl: "http://jenkins.devops-tools.svc.cluster.local:8080"
-
-  securityRealm:
-    disableRememberMe: false
-
-  crumbIssuer:
-    enabled: true
-
-rbac:
-  create: false
+      memory: "1024Mi"
 
