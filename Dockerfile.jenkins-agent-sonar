@@ -1,0 +1,15 @@
+FROM jenkins/inbound-agent:alpine
+
+USER root
+
+RUN apk add --no-cache curl unzip bash openjdk17 git && \
+    curl -sSLo /tmp/sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006.zip && \
+    unzip /tmp/sonar-scanner.zip -d /opt && \
+    ln -s /opt/sonar-scanner-5.0.1.3006 /opt/sonar-scanner && \
+    ln -s /opt/sonar-scanner/bin/sonar-scanner /usr/local/bin/sonar-scanner && \
+    rm /tmp/sonar-scanner.zip
+
+ENV SONAR_SCANNER_OPTS="-server"
+
+USER jenkins
+
