@@ -31,21 +31,25 @@ spec:
       }
     }
 
-    stage('SonarQube Analysis') {
-      steps {
+stage('SonarQube Analysis') {
+    steps {
         withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_TOKEN')]) {
-          dir("${APP_DIR}") {
-            sh '''
-              sonar-scanner \
-                -Dsonar.projectKey=$SONAR_PROJECT_KEY \
-                -Dsonar.sources=. \
-                -Dsonar.host.url=$SONAR_HOST_URL \
-                -Dsonar.login=$SONAR_TOKEN
-            '''
-          }
+            dir("${APP_DIR}") {
+                sh '''
+                    echo "Проверяю доступность DNS имени SonarQube..."
+                    nslookup sonarqube.devops-tools.svc.cluster.local || dig sonarqube.devops-tools.svc.cluster.local || ping -c 3 sonarqube.devops-tools.svc.cluster.local
+                    
+                    echo "Запускаю анализ SonarScanner..."
+                    sonar-scanner \
+                      -Dsonar.projectKey=$SONAR_PROJECT_KEY \
+                      -Dsonar.sources=. \
+                      -Dsonar.host.url=$SONAR_HOST_URL \
+                      -Dsonar.login=$SONAR_TOKEN
+                '''
+            }
         }
-      }
     }
+}
 
     stage('Build Docker image') {
       steps {
