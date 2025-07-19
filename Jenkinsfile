@@ -21,7 +21,7 @@ spec:
     APP_DIR = 'app/flask-app'
     HELM_DIR = 'helm/flask-app'
     SONAR_PROJECT_KEY = 'rsschool-flask'
-    SONAR_HOST_URL = 'http://sonarqube.devops-tools.svc.cluster.local:9000'
+    SONAR_HOST_URL = 'http://sonarqube-sonarqube.devops-tools.svc.cluster.local:9000'
   }
 
   stages {
@@ -30,26 +30,26 @@ spec:
         checkout scm
       }
     }
-
-stage('SonarQube Analysis') {
-    steps {
+    stage('SonarQube Analysis') {
+      steps {
         withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_TOKEN')]) {
-            dir("${APP_DIR}") {
-                sh '''
-                    echo "Проверяю доступность DNS имени SonarQube..."
-                    nslookup sonarqube.devops-tools.svc.cluster.local || dig sonarqube.devops-tools.svc.cluster.local || ping -c 3 sonarqube.devops-tools.svc.cluster.local
-                    
-                    echo "Запускаю анализ SonarScanner..."
-                    sonar-scanner \
-                      -Dsonar.projectKey=$SONAR_PROJECT_KEY \
-                      -Dsonar.sources=. \
-                      -Dsonar.host.url=$SONAR_HOST_URL \
-                      -Dsonar.login=$SONAR_TOKEN
-                '''
-            }
+          dir("${APP_DIR}") {
+            sh '''
+              echo "Проверяю доступность DNS имени SonarQube..."
+              nslookup sonarqube-sonarqube.devops-tools.svc.cluster.local
+              ping -c 3 sonarqube-sonarqube.devops-tools.svc.cluster.local
+
+              echo "Запускаю анализ SonarScanner..."
+              sonar-scanner \
+                -Dsonar.projectKey=$SONAR_PROJECT_KEY \
+                -Dsonar.sources=. \
+                -Dsonar.host.url=$SONAR_HOST_URL \
+                -Dsonar.login=$SONAR_TOKEN
+            '''
+          }
         }
+      }
     }
-}
 
     stage('Build Docker image') {
       steps {
@@ -58,7 +58,6 @@ stage('SonarQube Analysis') {
         }
       }
     }
-
     stage('Push Docker image') {
       steps {
         withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKERHUB_USER', passwordVariable: 'DOCKERHUB_PASS')]) {
