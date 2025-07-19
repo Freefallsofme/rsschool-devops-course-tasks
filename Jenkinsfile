@@ -1,5 +1,17 @@
 pipeline {
-    agent any
+    agent {
+        kubernetes {
+            yaml """
+apiVersion: v1
+kind: Pod
+spec:
+  containers:
+  - name: jnlp
+    image: atatara/jenkins-agent-sonar:latest
+    args: ['\$(JENKINS_SECRET)', '\$(JENKINS_NAME)']
+"""
+        }
+    }
 
     environment {
         DOCKER_IMAGE = 'atatara/rsschool-flask'
