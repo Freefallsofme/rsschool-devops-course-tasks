@@ -6,7 +6,7 @@ metadata:
 spec:
   containers:
     - name: jnlp
-      image: jenkins/inbound-agent:latest
+      image: freefallsofme/jenkins-agent-sonar:latest
       args: ['$(JENKINS_SECRET)', '$(JENKINS_NAME)']
     - name: docker
       image: docker:dind
