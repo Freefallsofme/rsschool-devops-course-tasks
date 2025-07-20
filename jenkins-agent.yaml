@@ -4,6 +4,7 @@ metadata:
   labels:
     some-label: jenkins-agent
 spec:
+  serviceAccountName:jenkins-agent
   containers:
     - name: jnlp
       image: atatara/jenkins-agent-sonar-helm:latest
