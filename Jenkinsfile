@@ -14,7 +14,12 @@ spec:
     securityContext:
       privileged: true
     command:
-      - cat
+      - sh
+      - -c
+      - |
+        dockerd-entrypoint.sh &
+        sleep 5
+        tail -f /dev/null
     tty: true
     volumeMounts:
       - mountPath: /home/jenkins/agent
