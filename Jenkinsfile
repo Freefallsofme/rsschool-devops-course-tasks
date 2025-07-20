@@ -35,11 +35,13 @@ spec:
         withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_TOKEN')]) {
           dir("${APP_DIR}") {
             sh '''
-              echo " Checking availiability DNS SonarQube..."
+              echo "Checking DNS availability of SonarQube..."
               nslookup sonarqube-sonarqube.devops-tools.svc.cluster.local
-              ping -c 3 sonarqube-sonarqube.devops-tools.svc.cluster.local
 
-              echo " Starting some shiet SonarScanner..."
+              echo "Checking HTTP availability of SonarQube..."
+              curl -sSf $SONAR_HOST_URL
+
+              echo "Starting SonarScanner..."
               sonar-scanner \
                 -Dsonar.projectKey=$SONAR_PROJECT_KEY \
                 -Dsonar.sources=. \
