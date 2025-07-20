@@ -8,6 +8,7 @@ metadata:
   namespace: devops-tools
 spec:
   dnsPolicy: ClusterFirst
+  serviceAccountName: jenkins-agent
   containers:
   - name: docker
     image: docker:25.0.3-dind
