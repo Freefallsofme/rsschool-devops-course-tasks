@@ -1,79 +1,101 @@
 pipeline {
-  agent {
-    kubernetes {
-      yaml """
+    agent {
+        kubernetes {
+            label 'sonar-flask-agent'
+            yaml """
 apiVersion: v1
 kind: Pod
-metadata:
-  namespace: devops-tools
 spec:
   containers:
   - name: docker
     image: docker:25.0.3-dind
-    command:
-    - cat
-    tty: true
     securityContext:
       privileged: true
+    tty: true
+    volumeMounts:
+    - name: workspace-volume
+      mountPath: /home/jenkins/agent
   - name: helm
     image: alpine/helm:3.14.3
-    command:
-    - cat
     tty: true
+    volumeMounts:
+    - name: workspace-volume
+      mountPath: /home/jenkins/agent
   - name: jnlp
     image: jenkins/inbound-agent:alpine
-    args: ['\$(JENKINS_SECRET)', '\$(JENKINS_NAME)']
+    env:
+      - name: JENKINS_URL
+        value: "http://jenkins.devops-tools.svc.cluster.local:8080/"
+    volumeMounts:
+    - name: workspace-volume
+      mountPath: /home/jenkins/agent
+  volumes:
+  - name: workspace-volume
+    emptyDir: {}
 """
-    }
-  }
-
-  environment {
-    DOCKER_IMAGE = 'atatara/rsschool-flask'
-    APP_DIR = 'app/flask-app'
-    HELM_DIR = 'helm/flask-app'
-  }
-
-  stages {
-    stage('Checkout') {
-      steps {
-        checkout scm
-      }
-    }
-
-    stage('Build Docker image') {
-      steps {
-        container('docker') {
-          dir("${APP_DIR}") {
-            sh 'dockerd-entrypoint.sh &'
-            sh 'sleep 10'
-            sh 'docker build -t $DOCKER_IMAGE .'
-          }
         }
-      }
     }
 
-    stage('Push Docker image') {
-      steps {
-        container('docker') {
-          withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKERHUB_USER', passwordVariable: 'DOCKERHUB_PASS')]) {
-            script {
-              sh 'echo $DOCKERHUB_PASS | docker login -u $DOCKERHUB_USER --password-stdin'
-              sh 'docker push $DOCKER_IMAGE'
+    environment {
+        DOCKERHUB_CRED = credentials('docker-hub-creds')
+        SONARQUBE_SERVER = 'SonarQube' // Имя SonarQube сервера в Jenkins (см. в настройках)
+    }
+
+    stages {
+        stage('Checkout SCM') {
+            steps {
+                checkout scm
             }
-          }
         }
-      }
-    }
 
-    stage('Deploy with Helm') {
-      steps {
-        container('helm') {
-          dir("${HELM_DIR}") {
-            sh 'helm upgrade --install flask-app . --set image.repository=$DOCKER_IMAGE'
-          }
+        stage('SonarQube Analysis') {
+            steps {
+                container('docker') {
+                    script {
+                        withSonarQubeEnv(SONARQUBE_SERVER) {
+                            sh 'sonar-scanner -Dsonar.projectKey=flask-app -Dsonar.sources=app'
+                        }
+                    }
+                }
+            }
         }
-      }
+
+        stage('Build Docker image') {
+            steps {
+                container('docker') {
+                    dir('app/flask-app') {
+                        sh '''
+                            dockerd-entrypoint.sh &
+                            sleep 10
+                            docker build -t atatara/rsschool-flask .
+                        '''
+                    }
+                }
+            }
+        }
+
+        stage('Push Docker image') {
+            steps {
+                container('docker') {
+                    withCredentials([usernamePassword(credentialsId: 'docker-hub-creds', passwordVariable: 'DOCKERHUB_PASS', usernameVariable: 'DOCKERHUB_USER')]) {
+                        sh '''
+                            echo $DOCKERHUB_PASS | docker login -u $DOCKERHUB_USER --password-stdin
+                            docker push atatara/rsschool-flask
+                        '''
+                    }
+                }
+            }
+        }
+
+        stage('Deploy with Helm') {
+            steps {
+                container('helm') {
+                    dir('helm/flask-app') {
+                        sh 'helm upgrade --install flask-app . --set image.repository=atatara/rsschool-flask'
+                    }
+                }
+            }
+        }
     }
-  }
 }
 
