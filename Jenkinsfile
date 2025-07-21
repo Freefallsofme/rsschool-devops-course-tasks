@@ -38,7 +38,8 @@ pipeline {
             sh '''
               pip install -r requirements.txt
               pip install pytest coverage
-              coverage run -m pytest --junitxml=report.xml --cov=. --cov-report=xml:coverage.xml
+              coverage run -m pytest --junitxml=report.xml
+              coverage xml -o coverage.xml
             '''
           }
         }
