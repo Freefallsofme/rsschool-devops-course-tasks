@@ -3,31 +3,21 @@
 This repository contains a complete CI/CD pipeline for a Flask web application. The pipeline is managed by Jenkins and includes code analysis with SonarQube, testing, Docker image building and pushing, and deployment via Helm to Kubernetes.
 
 ##  Project Structure
+```
 .
 ├── app
-
 │ └── flask-app
-
 │ ├── Dockerfile
-
 │ ├── requirements.txt
-
 │ └── ...
-
 ├── helm
-
 │ └── flask-app
-
 │ ├── Chart.yaml
-
 │ ├── values.yaml
-
 │ └── templates/
-
 ├── jenkins-agent.yaml
-
 └── Jenkinsfile
-
+```
 ## Jenkins Pipeline Stages
 
 The `Jenkinsfile` defines the following stages:
