@@ -95,9 +95,10 @@ Tests are located in the Flask app directory and executed using:
 ## Helm Deployment
 Deploys the application using the Helm chart:
 
+```bash
 helm upgrade --install flask-app ./helm/flask-app \
   --namespace devops-tools \
   --set image.repository=atatara/flask-app \
   --set image.tag=${BUILD_NUMBER}
 
-```bash
+
