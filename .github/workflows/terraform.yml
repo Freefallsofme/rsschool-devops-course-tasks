@@ -18,9 +18,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
       - uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: 1.5.5
+
       - run: terraform fmt -check -recursive
         working-directory: terraform
 
@@ -30,17 +32,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
       - uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: 1.5.5
+
       - uses: aws-actions/configure-aws-credentials@v2
         with:
           role-to-assume: arn:aws:iam::639794896843:role/GithubActionsRole
           aws-region: eu-north-1
+
       - run: terraform init
         working-directory: terraform
+
       - run: terraform plan -out=tfplan
         working-directory: terraform
+
       - uses: actions/upload-artifact@v4
         with:
           name: terraform-plan
@@ -53,15 +60,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
       - uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: 1.5.5
+
       - uses: aws-actions/configure-aws-credentials@v2
         with:
           role-to-assume: arn:aws:iam::639794896843:role/GithubActionsRole
           aws-region: eu-north-1
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: terraform-plan
+          path: terraform
+
       - run: terraform init
         working-directory: terraform
+
       - run: terraform apply -auto-approve tfplan
         working-directory: terraform
 
