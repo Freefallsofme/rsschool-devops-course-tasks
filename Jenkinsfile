@@ -7,7 +7,7 @@ pipeline {
 
   environment {
     DOCKER_IMAGE = "atatara/flask-app:${env.BUILD_NUMBER}"
-    APP_DIR = "app/flask-app"
+    APP_DIR     = "app/flask-app"
   }
 
   stages {
@@ -73,7 +73,7 @@ pipeline {
       steps {
         container('helm') {
           sh '''
-            helm upgrade --install flask-app helm-chart/flask-app \
+            helm upgrade --install flask-app ./helm-chart/flask-app \
               --namespace devops-tools \
               --set image.repository=atatara/flask-app \
               --set image.tag=${BUILD_NUMBER}
