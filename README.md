@@ -90,5 +90,14 @@ Using the `Telegram Bot` plugin in Jenkins and environment variables.
 
 Tests are located in the Flask app directory and executed using:
 
+`pytest --junitxml=report.xml --cov=. --cov-report=xml`
+
+## Helm Deployment
+Deploys the application using the Helm chart:
+
+helm upgrade --install flask-app ./helm/flask-app \
+  --namespace devops-tools \
+  --set image.repository=atatara/flask-app \
+  --set image.tag=${BUILD_NUMBER}
+
 ```bash
-pytest --junitxml=report.xml --cov=. --cov-report=xml
