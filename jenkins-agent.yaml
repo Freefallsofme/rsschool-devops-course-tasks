@@ -16,6 +16,19 @@ spec:
       volumeMounts:
         - name: docker-graph-storage
           mountPath: /var/lib/docker
+    - name: sonar
+      image: sonarsource/sonar-scanner-cli:latest
+      command:
+        - cat
+      tty: true
+      env:
+        - name: SONAR_HOST_URL
+          value: "http://sonarqube-sonarqube.devops-tools.svc.cluster.local:9000"
+        - name: SONAR_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: sonarqube-token
+              key: SONAR_TOKEN
   volumes:
     - name: docker-graph-storage
       emptyDir: {}
