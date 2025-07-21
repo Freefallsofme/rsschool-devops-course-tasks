@@ -33,12 +33,12 @@ pipeline {
 
     stage('Run tests') {
       steps {
-        container('jnlp') {
+        container('python') {
           dir("${APP_DIR}") {
             sh '''
-              echo "Running unit tests..."
               pip install -r requirements.txt
-              pytest
+              pip install pytest coverage
+              coverage run -m pytest --junitxml=report.xml --cov=. --cov-report=xml:coverage.xml
             '''
           }
         }

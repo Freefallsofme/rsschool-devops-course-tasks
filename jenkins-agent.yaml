@@ -5,10 +5,14 @@ metadata:
     some-label: jenkins-agent
 spec:
   serviceAccountName: jenkins-agent
+  restartPolicy: Never
   containers:
     - name: jnlp
       image: atatara/jenkins-agent-sonar-helm:latest
       args: ['$(JENKINS_SECRET)', '$(JENKINS_NAME)']
+      volumeMounts:
+        - name: workspace-volume
+          mountPath: /home/jenkins/agent
     - name: docker
       image: docker:dind
       securityContext:
@@ -16,10 +20,11 @@ spec:
       volumeMounts:
         - name: docker-graph-storage
           mountPath: /var/lib/docker
+        - name: workspace-volume
+          mountPath: /home/jenkins/agent
     - name: sonar
       image: sonarsource/sonar-scanner-cli:latest
-      command:
-        - cat
+      command: ['cat']
       tty: true
       env:
         - name: SONAR_HOST_URL
@@ -29,7 +34,26 @@ spec:
             secretKeyRef:
               name: sonarqube-token
               key: SONAR_TOKEN
+      volumeMounts:
+        - name: workspace-volume
+          mountPath: /home/jenkins/agent
+    - name: python
+      image: python:3.10
+      command: ['cat']
+      tty: true
+      volumeMounts:
+        - name: workspace-volume
+          mountPath: /home/jenkins/agent
+    - name: helm
+      image: alpine/helm:3.14.0
+      command: ['cat']
+      tty: true
+      volumeMounts:
+        - name: workspace-volume
+          mountPath: /home/jenkins/agent
   volumes:
     - name: docker-graph-storage
+      emptyDir: {}
+    - name: workspace-volume
       emptyDir: {}
 
