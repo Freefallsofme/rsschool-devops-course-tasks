@@ -73,7 +73,7 @@ pipeline {
       steps {
         container('helm') {
           sh '''
-            helm upgrade --install flask-app ./helm-chart/flask-app \
+            helm upgrade --install flask-app ./helm/flask-app \
               --namespace devops-tools \
               --set image.repository=atatara/flask-app \
               --set image.tag=${BUILD_NUMBER}
