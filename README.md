@@ -5,16 +5,27 @@ This repository contains a complete CI/CD pipeline for a Flask web application. 
 ##  Project Structure
 .
 ├── app
+
 │ └── flask-app
+
 │ ├── Dockerfile
+
 │ ├── requirements.txt
+
 │ └── ...
+
 ├── helm
+
 │ └── flask-app
+
 │ ├── Chart.yaml
+
 │ ├── values.yaml
+
 │ └── templates/
+
 ├── jenkins-agent.yaml
+
 └── Jenkinsfile
 
 ## Jenkins Pipeline Stages
