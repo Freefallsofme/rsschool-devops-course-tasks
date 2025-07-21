@@ -8,6 +8,8 @@ pipeline {
   environment {
     DOCKER_IMAGE = "atatara/flask-app:${env.BUILD_NUMBER}"
     APP_DIR     = "app/flask-app"
+    TELEGRAM_BOT_TOKEN = credentials('TELEGRAM_BOT_TOKEN') // Secret text credential in Jenkins
+    TELEGRAM_CHAT_ID = '239608115' // твой chat id
   }
 
   stages {
@@ -79,6 +81,27 @@ pipeline {
               --set image.tag=${BUILD_NUMBER}
           '''
         }
+      }
+    }
+  }
+
+  post {
+    success {
+      script {
+        sh """
+          curl -s -X POST https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage \
+          -d chat_id=${TELEGRAM_CHAT_ID} \
+          -d text='Jenkins pipeline #${env.BUILD_NUMBER} SUCCESSFUL for ${env.JOB_NAME}'
+        """
+      }
+    }
+    failure {
+      script {
+        sh """
+          curl -s -X POST https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage \
+          -d chat_id=${TELEGRAM_CHAT_ID} \
+          -d text='Jenkins pipeline #${env.BUILD_NUMBER} FAILED for ${env.JOB_NAME}'
+        """
       }
     }
   }
