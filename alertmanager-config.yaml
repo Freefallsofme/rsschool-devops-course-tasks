@@ -19,6 +19,5 @@ data:
     receivers:
     - name: 'email-notifications'
       email_configs:
-      - to: 'hogcatcher@example.com'   
+      - to: 'hogcatcher@example.com'
         send_resolved: true
-

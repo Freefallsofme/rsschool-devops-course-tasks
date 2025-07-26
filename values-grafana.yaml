@@ -32,4 +32,3 @@ initContainers:
     volumeMounts:
       - name: data
         mountPath: /var/lib/grafana
-
