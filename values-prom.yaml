@@ -66,6 +66,11 @@ server:
           replacement: $1:$2
           target_label: __address__
 
+  alerting:
+    alertmanagers:
+      - static_configs:
+          - targets: ['prometheus-alertmanager.monitoring.svc:9093']
+
 serverFiles:
   alerting_rules.yml:
     groups:
