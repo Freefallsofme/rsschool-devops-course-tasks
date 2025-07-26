@@ -94,6 +94,15 @@ serverFiles:
               summary: "Low available memory on {{ $labels.instance }}"
               description: "Less than 20% memory available for more than 1 minute."
 
+          - alert: AlwaysFiring
+            expr: vector(1)
+            for: 0m
+            labels:
+              severity: critical
+            annotations:
+              summary: "Test alert firing"
+              description: "This alert always fires."
+
 alertmanager:
   configMapOverrideName: alertmanager-config
   persistentVolume:
