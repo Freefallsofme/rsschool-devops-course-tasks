@@ -66,6 +66,29 @@ server:
           replacement: $1:$2
           target_label: __address__
 
+serverFiles:
+  alerting_rules.yml:
+    groups:
+      - name: node.rules
+        rules:
+          - alert: HighCpuUsage
+            expr: 100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 70
+            for: 1m
+            labels:
+              severity: warning
+            annotations:
+              summary: "High CPU usage detected on {{ $labels.instance }}"
+              description: "CPU usage is above 70% for more than 1 minute."
+
+          - alert: LowMemoryAvailable
+            expr: (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100 < 20
+            for: 1m
+            labels:
+              severity: warning
+            annotations:
+              summary: "Low available memory on {{ $labels.instance }}"
+              description: "Less than 20% memory available for more than 1 minute."
+
 alertmanager:
   configMapOverrideName: alertmanager-config
   persistentVolume:
