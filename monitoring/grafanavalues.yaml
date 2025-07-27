@@ -1,0 +1,40 @@
+persistence:
+  enabled: true
+  size: 5Gi
+  storageClassName: "standard"
+
+service:
+  type: ClusterIP
+  port: 3000
+  targetPort: 3000
+
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    datasources:
+      - name: Prometheus
+        type: prometheus
+        url: http://prometheus-server.monitoring.svc.cluster.local:80
+        access: proxy
+        isDefault: true
+
+grafana.ini:
+  smtp:
+    enabled: true
+    host: smtp4dev.monitoring.svc.cluster.local:25
+    skip_verify: true
+    from_address: grafana@example.com
+    from_name: Grafana
+  alerting:
+    enabled: true
+  unified_alerting:
+    enabled: true
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 250m
+    memory: 256Mi
+
