@@ -18,17 +18,39 @@ datasources:
         access: proxy
         isDefault: true
 
-grafana.ini:
-  smtp:
+smtp:
+  enabled: true
+  host: smtp4dev.monitoring.svc.cluster.local:25
+  fromAddress: grafana@example.com
+  skipVerify: true
+
+alerting:
+  enabled: true
+  unifiedAlerting:
     enabled: true
-    host: smtp4dev.monitoring.svc.cluster.local:25
-    skip_verify: true
-    from_address: grafana@example.com
-    from_name: Grafana
+
+provisioning:
   alerting:
     enabled: true
-  unified_alerting:
+    configMaps:
+      - name: provgraf
+        items:
+          - cpu-alert.yaml
+          - memory-alert.yaml
+
+  contactPoints:
     enabled: true
+    configMaps:
+      - name: provgraf
+        items:
+          - contact-points.yaml
+
+  notificationPolicies:
+    enabled: true
+    configMaps:
+      - name: provgraf
+        items:
+          - notification-policies.yaml
 
 resources:
   limits:

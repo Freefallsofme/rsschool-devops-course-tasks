@@ -1,0 +1,101 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: provgraf
+  namespace: monitoring
+data:
+  cpu-alert.yaml: |
+    apiVersion: 1
+    groups:
+      - name: CPUAlerts
+        interval: 1m
+        rules:
+          - uid: high-node-cpu
+            title: High CPU Usage on Node
+            condition: B
+            data:
+              - refId: A
+                relativeTimeRange:
+                  from: 600
+                  to: 0
+                datasourceUid: prometheus
+                model:
+                  expr: 100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)
+                  format: time_series
+                  legendFormat: "{{instance}}"
+                  refId: A
+              - refId: B
+                datasourceUid: prometheus
+                model:
+                  reducer: last
+                  expression: A
+                  type: reduce
+                  refId: B
+            noDataState: NoData
+            execErrState: Error
+            for: 5m
+            annotations:
+              summary: "High CPU usage detected on node"
+              description: "CPU usage > 80% for 5 minutes on {{ $labels.instance }}"
+  memory-alert.yaml: |
+    apiVersion: 1
+    groups:
+      - name: RAMAlerts
+        interval: 1m
+        rules:
+          - uid: low-node-ram
+            title: Low RAM on Node
+            condition: B
+            data:
+              - refId: A
+                relativeTimeRange:
+                  from: 600
+                  to: 0
+                datasourceUid: prometheus
+                model:
+                  expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes * 100 > 80
+                  format: time_series
+                  legendFormat: "{{instance}}"
+                  refId: A
+              - refId: B
+                datasourceUid: prometheus
+                model:
+                  reducer: last
+                  expression: A
+                  type: reduce
+                  refId: B
+            noDataState: NoData
+            execErrState: Error
+            for: 5m
+            annotations:
+              summary: "Low available memory on node"
+              description: "Available memory < 20% for 5 minutes on {{ $labels.instance }}"
+  contact-points.yaml: |
+    apiVersion: 1
+    kind: contact-point
+    metadata:
+      name: smtp4dev-test
+    spec:
+      type: email
+      settings:
+        addresses: "test@example.com"
+        sendReminder: false
+        frequency: "15m"
+        disableResolveMessage: false
+  notification-policies.yaml: |
+    apiVersion: 1
+    kind: notification-policy
+    metadata:
+      name: default-policy
+    spec:
+      receivers:
+        - uid: smtp4dev-test
+      match:
+        - matcher:
+            - op: "equal"
+              name: "severity"
+              value: "critical"
+      groupWaitSeconds: 10
+      groupIntervalSeconds: 10
+      repeatIntervalSeconds: 3600
+
