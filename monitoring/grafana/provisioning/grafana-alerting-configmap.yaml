@@ -1,0 +1,47 @@
+apiVersion: v1
+data:
+  contact-points.yaml: |+
+    apiVersion: 1
+    kind: ContactPoint
+    metadata:
+      name: smtp4dev-email
+    spec:
+      type: email
+      settings:
+        addresses: "test@example.com"
+        smarthost: "smtp4dev.monitoring.svc.cluster.local:25"
+        fromAddress: "grafana@example.com"
+        ehloIdentity: "grafana"
+        auth:
+          enabled: false
+
+  notification-policies.yaml: |+
+    apiVersion: 1
+    kind: NotificationPolicy
+    metadata:
+      name: default-policy
+    spec:
+      receivers:
+        - contactPoint: smtp4dev-email
+      default: true
+
+  rules.yaml: |+
+    apiVersion: 1
+    groups:
+    - name: node-alerts
+      interval: 1m
+      rules:
+      - alert: HighCPUUsage
+        expr: 100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage on {{ $labels.instance }}"
+          description: "CPU usage is above 80% for more than 2 minutes."
+
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  name: grafana-alerting-config
+  namespace: monitoring

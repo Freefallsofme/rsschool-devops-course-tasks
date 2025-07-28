@@ -1,0 +1,14 @@
+apiVersion: 1
+kind: ContactPoint
+metadata:
+  name: smtp4dev-email
+spec:
+  type: email
+  settings:
+    addresses: "test@example.com"
+    smarthost: "smtp4dev.monitoring.svc.cluster.local:25"
+    fromAddress: "grafana@example.com"
+    ehloIdentity: "grafana"
+    auth:
+      enabled: false
+

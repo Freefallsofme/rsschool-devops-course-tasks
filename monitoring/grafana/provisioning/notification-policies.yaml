@@ -1,0 +1,9 @@
+apiVersion: 1
+kind: NotificationPolicy
+metadata:
+  name: default-policy
+spec:
+  receivers:
+    - contactPoint: smtp4dev-email
+  default: true
+
