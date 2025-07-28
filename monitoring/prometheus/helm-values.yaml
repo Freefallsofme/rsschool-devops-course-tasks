@@ -1,0 +1,29 @@
+alertmanager:
+  enabled: true
+  service:
+    type: ClusterIP
+  alertmanagerSpec:
+    configMapName: alertmanager-config
+
+server:
+  enabled: true
+  service:
+    type: ClusterIP
+  alerting:
+    alertmanagers:
+      - static_configs:
+          - targets:
+              - "prometheus-alertmanager.monitoring.svc.cluster.local:9093"
+
+nodeExporter:
+  enabled: true
+
+kubeStateMetrics:
+  enabled: true
+
+pushgateway:
+  enabled: false
+
+configmapReload:
+  enabled: true
+

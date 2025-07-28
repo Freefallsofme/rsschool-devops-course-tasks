@@ -1,0 +1,11 @@
+apiVersion: v1
+data:
+  alertmanager.yml: "global:\n  smtp_smarthost: 'smtp4dev.monitoring.svc.cluster.local:25'\n
+    \ smtp_from: 'alertmanager@example.local'\n\nroute:\n  receiver: 'email'\n\nreceivers:\n-
+    name: 'email'\n  email_configs:\n  - to: 'test@example.com' \n    send_resolved:
+    true\n\n"
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  name: alertmanager-config
+  namespace: monitoring
