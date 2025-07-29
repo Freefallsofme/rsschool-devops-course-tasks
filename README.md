@@ -60,7 +60,6 @@ Creates the monitoring namespace.
 Adds Helm repositories for Prometheus and Grafana.
 Deploys Prometheus using prometheusval.yaml.
 Deploys smtp4dev using smtp4dev.yaml.
-Creates a secret for Grafana admin password (grafana-env).
 Creates ConfigMaps for alerting (grafana-provisioning) and dashboard (grafana-dashboards).
 Deploys Grafana using grafanaval.yaml.
 
