@@ -1,5 +1,5 @@
 persistence:
-  enabled: false
+  enabled: "false"
 
 datasources:
   datasources.yaml:
@@ -12,35 +12,46 @@ datasources:
       isDefault: true
       uid: prometheus
 
-dashboards:
-  default:
-    cluster-metrics:
-      url: https://grafana.com/api/dashboards/1860/revisions/22/download
-
 grafana.ini:
   smtp:
-    enabled: true
+    enabled: "true"
     host: smtp4dev.monitoring.svc.cluster.local:25
-    skip_verify: true
+    skip_verify: "true"
     from_address: grafana@example.com
 
-extraVolumes:
-  - name: grafana-provisioning
-    configMap:
-      name: grafana-provisioning
+dashboardProviders:
+  dashboardproviders.yaml:
+    apiVersion: 1
+    providers:
+    - name: default
+      orgId: 1
+      folder: MonitoringRules
+      type: file
+      disableDeletion: false
+      editable: true
+      options:
+        path: /etc/grafana/provisioning/dashboards
 
-extraVolumeMounts:
-  - name: grafana-provisioning
-    mountPath: /etc/grafana/provisioning/alerting/rules.yaml
+extraConfigmapMounts:
+  - name: grafana-provisioning-rules
+    configMap: grafana-provisioning
     subPath: rules.yaml
+    mountPath: /etc/grafana/provisioning/alerting/rules.yaml
     readOnly: true
-  - name: grafana-provisioning
-    mountPath: /etc/grafana/provisioning/notifications/contactpoints.yaml
+  - name: grafana-provisioning-contactpoints
+    configMap: grafana-provisioning
     subPath: contactpoints.yaml
+    mountPath: /etc/grafana/provisioning/notifications/contactpoints.yaml
     readOnly: true
-  - name: grafana-provisioning
-    mountPath: /etc/grafana/provisioning/notifications/policies.yaml
+  - name: grafana-provisioning-policies
+    configMap: grafana-provisioning
     subPath: policies.yaml
+    mountPath: /etc/grafana/provisioning/notifications/policies.yaml
+    readOnly: true
+  - name: grafana-dashboards
+    configMap: grafana-dashboards
+    subPath: custom-dashboard.json
+    mountPath: /etc/grafana/provisioning/dashboards/custom-dashboard.json
     readOnly: true
 
 plugins: []

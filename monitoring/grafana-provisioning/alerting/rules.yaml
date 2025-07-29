@@ -32,7 +32,7 @@ groups:
         conditions:
         - evaluator:
             params:
-            - 90  
+            - 95 
             type: gt
           operator:
             type: and
@@ -43,7 +43,7 @@ groups:
             params: []
             type: last
           type: query
-    for: 1m  
+    for: 1m
     noDataState: NoData
     execErrState: Error
     annotations:
@@ -77,7 +77,7 @@ groups:
         conditions:
         - evaluator:
             params:
-            - 2 
+            - 1  
             type: lt
           operator:
             type: and
@@ -88,7 +88,7 @@ groups:
             params: []
             type: last
           type: query
-    for: 1m 
+    for: 1m
     noDataState: NoData
     execErrState: Error
     annotations:

@@ -15,7 +15,7 @@
       }
     ]
   },
-  "description": "RS School AWS DevOps course Task-7",
+  "description": "task_7",
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
@@ -38,7 +38,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus-server"
+        "uid": "prometheus" 
       },
       "description": "CPU usage (All cluster)",
       "fieldConfig": {
@@ -107,7 +107,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus-server"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -219,7 +219,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus-server"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -285,7 +285,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus-server"
+        "uid": "prometheus" 
       },
       "fieldConfig": {
         "defaults": {
@@ -378,7 +378,7 @@
       "options": {
         "legend": {
           "calcs": [],
-          "displayMode": "list",
+          "displayMode": "table",
           "placement": "bottom",
           "showLegend": false
         },
@@ -405,7 +405,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus-server"
+        "uid": "prometheus" 
       },
       "description": "Memory usage (GB)",
       "fieldConfig": {
@@ -498,7 +498,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus-server"
+        "uid": "prometheus" 
       },
       "fieldConfig": {
         "defaults": {
@@ -564,7 +564,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus-server"
+        "uid": "prometheus" 
       },
       "description": "Disk usage",
       "fieldConfig": {
@@ -661,7 +661,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus-server"
+        "uid": "prometheus"
       },
       "description": "Disk usage (GB)",
       "fieldConfig": {
@@ -752,4 +752,3 @@
   "uid": "40f46b24-b359-4b96-975f-68b9d03cf5d3",
   "version": 8
 }
-
