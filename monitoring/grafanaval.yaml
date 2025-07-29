@@ -1,0 +1,46 @@
+persistence:
+  enabled: false
+
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    datasources:
+    - name: Prometheus
+      type: prometheus
+      url: http://prometheus-server.monitoring.svc.cluster.local
+      access: proxy
+      isDefault: true
+      uid: prometheus
+
+dashboards:
+  default:
+    cluster-metrics:
+      url: https://grafana.com/api/dashboards/1860/revisions/22/download
+
+grafana.ini:
+  smtp:
+    enabled: true
+    host: smtp4dev.monitoring.svc.cluster.local:25
+    skip_verify: true
+    from_address: grafana@example.com
+
+extraVolumes:
+  - name: grafana-provisioning
+    configMap:
+      name: grafana-provisioning
+
+extraVolumeMounts:
+  - name: grafana-provisioning
+    mountPath: /etc/grafana/provisioning/alerting/rules.yaml
+    subPath: rules.yaml
+    readOnly: true
+  - name: grafana-provisioning
+    mountPath: /etc/grafana/provisioning/notifications/contactpoints.yaml
+    subPath: contactpoints.yaml
+    readOnly: true
+  - name: grafana-provisioning
+    mountPath: /etc/grafana/provisioning/notifications/policies.yaml
+    subPath: policies.yaml
+    readOnly: true
+
+plugins: []
