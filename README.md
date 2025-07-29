@@ -19,32 +19,22 @@ The custom dashboard (Task dashboard) is located in the MonitoringRules folder i
 Current metrics (CPU: 6.5%, RAM: 27.004%) ensure alerts are in Normal state (though currently in Firing, pending further debugging).
 ## Repository Structure
 
+```
 monitoring/
 ├── prometheusval.yaml            # Configuration for Prometheus Helm chart
-
 ├── grafanaval.yaml               # Configuration for Grafana Helm chart
-
 ├── smtp4dev.yaml                 # Deployment and Service for smtp4dev
-
 ├── grafana-provisioning/
-
 │   ├── alerting/
-
 │   │   └── rules.yaml            # Alerting rules for CPU and RAM
-
 │   ├── notifications/
-
 │   │   ├── contactpoints.yaml    # Email notification settings
-
 │   │   └── policies.yaml         # Notification routing policies
-
 │   ├── dashboards/
-
 │   │   └── custom-dashboard.json # Custom Grafana dashboard
-
 ├── deploy_monitoring.sh          # Script to deploy the monitoring stack
-
 └── README.md                     # This file
+```
 
 ## Prerequisites
 
