@@ -1,0 +1,97 @@
+apiVersion: 1
+groups:
+- orgId: 1
+  name: main
+  folder: MonitoringRules
+  interval: 60s
+  rules:
+  - uid: high_cpu
+    title: High CPU Usage
+    condition: B
+    data:
+    - refId: A
+      datasourceUid: prometheus
+      relativeTimeRange:
+        from: 300
+        to: 0
+      model:
+        expr: '100 - (avg by (instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)'
+        intervalMs: 1000
+        maxDataPoints: 43200
+    - refId: B
+      datasourceUid: __expr__
+      relativeTimeRange:
+        from: 300
+        to: 0
+      model:
+        expression: A
+        reducer: last
+        type: reduce
+        intervalMs: 1000
+        maxDataPoints: 43200
+        conditions:
+        - evaluator:
+            params:
+            - 95 
+            type: gt
+          operator:
+            type: and
+          query:
+            params:
+            - A
+          reducer:
+            params: []
+            type: last
+          type: query
+    for: 1m
+    noDataState: NoData
+    execErrState: Error
+    annotations:
+      summary: High CPU usage on {{ $labels.instance }}
+    labels:
+      severity: warning
+  - uid: low_ram
+    title: Low RAM Capacity
+    condition: B
+    data:
+    - refId: A
+      datasourceUid: prometheus
+      relativeTimeRange:
+        from: 300
+        to: 0
+      model:
+        expr: '(node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100'
+        intervalMs: 1000
+        maxDataPoints: 43200
+    - refId: B
+      datasourceUid: __expr__
+      relativeTimeRange:
+        from: 300
+        to: 0
+      model:
+        expression: A
+        reducer: last
+        type: reduce
+        intervalMs: 1000
+        maxDataPoints: 43200
+        conditions:
+        - evaluator:
+            params:
+            - 1  
+            type: lt
+          operator:
+            type: and
+          query:
+            params:
+            - A
+          reducer:
+            params: []
+            type: last
+          type: query
+    for: 1m
+    noDataState: NoData
+    execErrState: Error
+    annotations:
+      summary: Low RAM capacity on {{ $labels.instance }}
+    labels:
+      severity: warning
