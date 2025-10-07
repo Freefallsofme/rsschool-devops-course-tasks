@@ -1,0 +1,38 @@
+pipeline {
+    agent {
+        kubernetes {
+            label 'jenkins-jenkins-agent'
+            defaultContainer 'jnlp'
+            yaml '''
+            apiVersion: v1
+            kind: Pod
+            spec:
+              containers:
+              - name: jnlp
+                image: atatara/my-jenkins-agent:with-tools
+                resources:
+                  limits:
+                    cpu: "512m"
+                    memory: "512Mi"
+                  requests:
+                    cpu: "512m"
+                    memory: "512Mi"
+            '''
+        }
+    }
+    stages {
+        stage('Clone Repository') {
+            steps {
+                git url: 'https://github.com/Freefallsofme/rsschool-devops-course-tasks.git', branch: 'task_7'
+            }
+        }
+        stage('Deploy Monitoring Stack') {
+            steps {
+                dir('monitoring') {
+                    sh 'chmod +x deploy_monitoring.sh'
+                    sh './deploy_monitoring.sh'
+                }
+            }
+        }
+    }
+}
